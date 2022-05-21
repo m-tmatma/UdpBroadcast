@@ -19,6 +19,12 @@ namespace UdpBroadcast
                     {
                         if (uniCast.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
+                            if (IPAddress.IsLoopback(uniCast.Address))
+                            {
+                                continue;
+                            }
+
+
                             // IP version 4 のアドレス
                             yield return uniCast.Address;
                         }
