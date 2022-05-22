@@ -7,6 +7,19 @@ namespace UdpBroadcast
 {
     internal class Program
     {
+        static IPAddress GetBroadcastAddress(IPAddress address, IPAddress mask)
+        {
+            byte[] bytesAddress = address.GetAddressBytes();
+            byte[] bytesMask = mask.GetAddressBytes();
+            for( int i = 0; i < bytesAddress.Length; i++ )
+            {
+                bytesAddress[i] |= (byte)~bytesMask[i];
+            }
+
+            return new IPAddress(bytesAddress);
+        }
+
+
         static IEnumerable<IPAddress> GetBroadcastAddresses()
         {
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
@@ -19,14 +32,16 @@ namespace UdpBroadcast
                     {
                         if (uniCast.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
-                            if (IPAddress.IsLoopback(uniCast.Address))
+                            IPAddress address = uniCast.Address;
+                            if (IPAddress.IsLoopback(address))
                             {
                                 continue;
                             }
 
+                            IPAddress broadcast = GetBroadcastAddress(address, uniCast.IPv4Mask);
 
                             // IP version 4 のアドレス
-                            yield return uniCast.Address;
+                            yield return broadcast;
                         }
                     }
                 }
