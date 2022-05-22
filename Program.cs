@@ -87,15 +87,17 @@ namespace UdpBroadcast
             // 送信データ
             var buffer = Encoding.UTF8.GetBytes(data);
 
-            // ブロードキャスト有効化
-            client.EnableBroadcast = true;
             return client.SendAsync(buffer, buffer.Length, new IPEndPoint(targetAddress, dst_port));
         }
 
         static void SendBroadcastMessageToAll()
         {
             var tasks = new List<Task<int>>();
+
             var client = new UdpClient();
+            // ブロードキャスト有効化
+            client.EnableBroadcast = true;
+
             foreach (IPAddress address in GetBroadcastAddresses())
             {
                 Console.WriteLine(address);
