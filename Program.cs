@@ -92,9 +92,49 @@ namespace UdpBroadcast
             client.Close();
         }
 
+        static void SendCallback(IAsyncResult ar)
+        {
+            UdpClient? u = (UdpClient?)ar.AsyncState;
+            if (u != null)
+            {
+                int size = u.EndSend(ar);
+                Console.WriteLine($"number of bytes sent: {size}");
+            }
+        }
+
+
+        static void SendBroadcastMessage(UdpClient client, IPAddress targetAddress, string data)
+        {
+            // 送信先ポート
+            var dst_port = 18000;
+
+            // 送信データ
+            var buffer = Encoding.UTF8.GetBytes(data);
+
+            client.BeginSend(buffer, buffer.Length, new IPEndPoint(targetAddress, dst_port), new AsyncCallback(SendCallback), client);
+        }
+
+
+        static void SendBroadcastMessageToAll()
+        {
+            var client = new UdpClient();
+            // ブロードキャスト有効化
+            client.EnableBroadcast = true;
+
+            foreach (IPAddress address in GetBroadcastAddresses())
+            {
+                // ブロードキャスト送信
+                SendBroadcastMessage(client, address, "Hello, World!");
+            }
+
+            client.Close();
+        }
+
+
         static void Main(string[] args)
         {
             SendBroadcastMessageAsyncToAll();
+            SendBroadcastMessageToAll();
         }
     }
 }
