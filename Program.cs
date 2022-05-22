@@ -76,13 +76,48 @@ namespace UdpBroadcast
             client.Send(buffer, buffer.Length);
             client.Close();
         }
-        static void Main(string[] args)
+        static Task<int> SendBroadcastMessage(UdpClient client, IPAddress targetAddress, string data)
         {
+            // 送信先ポート
+            var dst_port = 18000;
+
+            // 送信データ
+            var buffer = Encoding.UTF8.GetBytes(data);
+
+            // ブロードキャスト有効化
+            client.EnableBroadcast = true;
+            client.Connect(new IPEndPoint(targetAddress, dst_port));
+            return client.SendAsync(buffer, buffer.Length);
+        }
+
+        static void SendBroadcastMessageToAll()
+        {
+            var tasks = new List<Task<int>>();
+            var clients = new List<UdpClient>();
             foreach (IPAddress address in GetBroadcastAddresses())
             {
                 Console.WriteLine(address);
-                SendBroadcastMessage(address, "Hello, World!");
+
+                var client = new UdpClient();
+
+                // ブロードキャスト送信
+                var task = SendBroadcastMessage(client, address, "Hello, World!");
+
+                tasks.Add(task);
+                clients.Add(client);
             }
+
+            Task.WaitAll(tasks.ToArray());
+
+            foreach (UdpClient client in clients)
+            {
+                client.Close();
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            SendBroadcastMessageToAll();
         }
     }
 }
