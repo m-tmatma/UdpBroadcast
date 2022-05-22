@@ -48,6 +48,8 @@ namespace UdpBroadcast
 
                             IPAddress broadcast = GetBroadcastAddress(address, uniCast.IPv4Mask);
 
+                            Console.Write($"{adapter.Description} : {adapter.Name} : {broadcast}\n");
+
                             // IP version 4 のアドレス
                             yield return broadcast;
                         }
@@ -100,9 +102,6 @@ namespace UdpBroadcast
 
             foreach (IPAddress address in GetBroadcastAddresses())
             {
-                Console.WriteLine(address);
-
-
                 // ブロードキャスト送信
                 var task = SendBroadcastMessage(client, address, "Hello, World!");
 
