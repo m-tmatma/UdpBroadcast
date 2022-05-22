@@ -24,6 +24,11 @@ namespace UdpBroadcast
         {
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
+                if (adapter.OperationalStatus != OperationalStatus.Up)
+                {
+                    continue;
+                }
+
                 IPInterfaceProperties properties = adapter.GetIPProperties();
                 UnicastIPAddressInformationCollection uniCastCollection = properties.UnicastAddresses;
                 if (uniCastCollection != null)
@@ -76,10 +81,8 @@ namespace UdpBroadcast
             foreach (IPAddress address in GetBroadcastAddresses())
             {
                 Console.WriteLine(address);
+                SendBroadcastMessage(address, "Hello, World!");
             }
-
-            var targetAddress = IPAddress.Parse("192.168.11.255");
-            SendBroadcastMessage(targetAddress, "Hello, World!");
         }
     }
 }
