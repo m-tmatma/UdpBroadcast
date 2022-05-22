@@ -89,8 +89,7 @@ namespace UdpBroadcast
 
             // ブロードキャスト有効化
             client.EnableBroadcast = true;
-            client.Connect(new IPEndPoint(targetAddress, dst_port));
-            return client.SendAsync(buffer, buffer.Length);
+            return client.SendAsync(buffer, buffer.Length, new IPEndPoint(targetAddress, dst_port));
         }
 
         static void SendBroadcastMessageToAll()
